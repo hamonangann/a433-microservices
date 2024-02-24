@@ -1,0 +1,20 @@
+version: "3.7" # Pakai versi 3.7 > 2
+
+services: # Daftar services
+  item-app: # App service
+    image: ghcr.io/hamonangann/item-app:v1 # image app pada Github Registry
+    restart: always # memastikan container selalu restart ketika terhenti
+    ports: 
+    - 80:8080 # map port 80 pada host ke port 8080 pada container (telah diexpose)
+    depends_on:
+    - "item-db" # memastikan item-db jalan duluan
+  item-db:
+    image: mongo:3 # menggunakan image mongoDB dari docker hub
+    restart: always # memastikan container selalu restart ketika terhenti
+    ports:
+    - 27017:27017 # map ke port 27017 pada container (dimana mongodb service listening)
+    volumes:
+    - app-db:/data/db # mount volume app-db pada direktori /data/db di kontainer
+
+volumes: # Daftar volumes
+  app-db:

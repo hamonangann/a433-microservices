@@ -1,0 +1,5 @@
+Link to Github Packages:
+https://github.com/users/hamonangann/packages/container/package/item-app
+
+How to pull:
+docker pull ghcr.io/hamonangann/item-app:v1
