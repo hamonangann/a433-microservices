@@ -11,8 +11,6 @@ services: # Daftar services
   item-db:
     image: mongo:3 # menggunakan image mongoDB dari docker hub
     restart: always # memastikan container selalu restart ketika terhenti
-    ports:
-    - 27017:27017 # map ke port 27017 pada container (dimana mongodb service listening)
     volumes:
     - app-db:/data/db # mount volume app-db pada direktori /data/db di kontainer
 
