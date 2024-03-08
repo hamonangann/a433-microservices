@@ -1,37 +1,36 @@
 version: 2.1 # File konfigurasi CircleCI
 
-jobs:
-  lint-dockerfile:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run:
-          name: Run hadolint
-          command: docker run --rm --interactive hadolint/hadolint < Dockerfile
+jobs: # Daftar jobs dari CI
+  lint-dockerfile: # Job untuk style check dockerfile
+    docker: # Image docker yang dipakai
+      - image: cimg/base:stable # Menggunakan base image CircleCI versi stable
+    steps: # Urutan langkah
+      - checkout # Pindahkan kode ke workdir CI runner
+      - setup_remote_docker # Setup docker-in-docker (dind)
+      - run: "docker run --rm --interactive hadolint/hadolint < Dockerfile" # Menjalankan hadolint untuk Dockerfile
   test-app:
     docker:
       - image: cimg/go:1.22
     steps:
       - checkout
       - run: "go test -v -short --count=1 $(go list ./...)"
-  build-app-karsajobs:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run: "echo $PASSWORD_GITHUB_PACKAGES | docker login ghcr.io -u hamonangann --password-stdin"
-      - run: "docker build -t ghcr.io/hamonangann/karsajobs:latest ."
-      - run: "docker push ghcr.io/hamonangann/karsajobs:latest"
-workflows:
-  example:
-    jobs:
-      - lint-dockerfile
-      - test-app:
-          requires:
-            - lint-dockerfile
-      - build-app-karsajobs:
-          requires:
-            - test-app
+  build-app-karsajobs: # Job untuk build dan push ke Github Packages
+    docker: # Image docker yang dipakai
+      - image: cimg/base:stable # Menggunakan base image CircleCI versi stable
+    steps: # Urutan langkah
+      - checkout # Pindahkan kode ke workdir CI runner
+      - setup_remote_docker # Setup docker-in-docker (dind)
+      - run: "echo $PASSWORD_GITHUB_PACKAGES | docker login ghcr.io -u hamonangann --password-stdin" # Login docker
+      - run: "docker build -t ghcr.io/hamonangann/karsajobs:latest ." # Buat image dengan tag sesuai format Github
+      - run: "docker push ghcr.io/hamonangann/karsajobs:latest" # Push ke github packages
+workflows: # Daftar workflow
+  karsajobs-ci: # Nama workflownya
+    jobs: # Daftar jobnya
+      - lint-dockerfile # Job ini tanpa prasyarat
+      - test-app: # Job dengan prasyarat
+          requires: # Daftar prasyarat
+            - lint-dockerfile # Job ini jalan setelah lint-dockerfile sukses
+      - build-app-karsajobs: # Job dengan prasyarat
+          requires: # Daftar prasyarat
+            - test-app # Job ini jalan setelah test-app yang jalan setelah lint-dockerfile. Jadi ini akan jalan terakhir.
+
