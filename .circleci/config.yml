@@ -1,0 +1,37 @@
+version: 2.1 # File konfigurasi CircleCI
+
+jobs:
+  lint-dockerfile:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Run hadolint
+          command: docker run --rm --interactive hadolint/hadolint < Dockerfile
+  test-app:
+    docker:
+      - image: cimg/go:stable
+    steps:
+      - checkout
+      - run: "go test -v -short --count=1 $(go list ./...)"
+  build-app-karsajobs:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: "echo $PASSWORD_DOCKER_HUB | docker login ghcr.io -u hamonangann --password-stdin"
+      - run: "docker build -t ghcr.io/hamonangann/karsajobs:latest ."
+      - run: "docker push ghcr.io/hamonangann/karsajobs:latest"
+workflows:
+  example:
+    jobs:
+      - lint-dockerfile
+      - test-app:
+          requires:
+            - lint-dockerfile
+      - build-app-karsajobs:
+          requires:
+            - test-app
