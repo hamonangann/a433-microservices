@@ -1,0 +1,26 @@
+version: 2.1 # File konfigurasi CircleCI
+
+jobs: # Daftar jobs dari CI
+  lint-dockerfile: # Job untuk style check dockerfile
+    docker: # Image docker yang dipakai
+      - image: cimg/base:stable # Menggunakan base image CircleCI versi stable
+    steps: # Urutan langkah
+      - checkout # Pindahkan kode ke workdir CI runner
+      - setup_remote_docker # Setup docker-in-docker (dind)
+      - run: "docker run --rm --interactive hadolint/hadolint < Dockerfile" # Menjalankan hadolint untuk Dockerfile
+  build-app-karsajobs-ui: # Job untuk build dan push ke Github Packages
+    docker: # Image docker yang dipakai
+      - image: cimg/base:stable # Menggunakan base image CircleCI versi stable
+    steps: # Urutan langkah
+      - checkout # Pindahkan kode ke workdir CI runner
+      - setup_remote_docker # Setup docker-in-docker (dind)
+      - run: "echo $PASSWORD_GITHUB_PACKAGES | docker login ghcr.io -u hamonangann --password-stdin" # Login docker
+      - run: "docker build -t ghcr.io/hamonangann/karsajobs-ui:latest ." # Buat image dengan tag sesuai format Github
+      - run: "docker push ghcr.io/hamonangann/karsajobs-ui:latest" # Push ke github packages
+workflows: # Daftar workflow
+  karsajobs-ui-ci: # Nama workflownya
+    jobs: # Daftar jobnya
+      - lint-dockerfile # Job ini tanpa prasyarat
+      - build-app-karsajobs-ui: # Job dengan prasyarat
+          requires: # Daftar prasyarat
+            - lint-dockerfile # Job ini jalan setelah lint-dockerfile sukses
