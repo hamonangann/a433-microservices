@@ -22,7 +22,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: "echo $PASSWORD_DOCKER_HUB | docker login ghcr.io -u hamonangann --password-stdin"
+      - run: "echo $PASSWORD_GITHUB_PACKAGES | docker login ghcr.io -u hamonangann --password-stdin"
       - run: "docker build -t ghcr.io/hamonangann/karsajobs:latest ."
       - run: "docker push ghcr.io/hamonangann/karsajobs:latest"
 workflows:
