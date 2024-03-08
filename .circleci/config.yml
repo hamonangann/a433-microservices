@@ -12,7 +12,7 @@ jobs:
           command: docker run --rm --interactive hadolint/hadolint < Dockerfile
   test-app:
     docker:
-      - image: cimg/go:stable
+      - image: cimg/go:1.22
     steps:
       - checkout
       - run: "go test -v -short --count=1 $(go list ./...)"
