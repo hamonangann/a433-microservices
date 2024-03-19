@@ -1,5 +1,5 @@
 # Menggunakan base image Node.js versi 14.
-FROM node:14 
+FROM node:14-alpine
 
 # Working directory untuk container adalah /app
 WORKDIR /app
@@ -14,7 +14,7 @@ ENV PORT=3000 AMQP_URL="amqp://localhost:5672"
 RUN npm install --production --unsafe-perm
 
 # Port yang digunakan oleh aplikasi
-EXPOSE 8080
+EXPOSE 3000
 
 # Jalankan server
 CMD ["npm", "start"]
