@@ -10,8 +10,8 @@ COPY . .
 # Setup environment variable
 ENV PORT=3000 AMQP_URL="amqp://localhost:5672"
 
-# Install dependensi and build app
-RUN npm install --production --unsafe-perm && npm run build
+# Install dependensi
+RUN npm install --production --unsafe-perm
 
 # Port yang digunakan oleh aplikasi
 EXPOSE 8080
